@@ -1,0 +1,13 @@
+{
+  "name": "mathpaperlib",
+  "owner": {
+    "name": "LeoLourson"
+  },
+  "plugins": [
+    {
+      "name": "mathpaperlib",
+      "source": "./",
+      "description": "A library of papers for agents: databases, downloads under readable names, an inbox folder, full-text search."
+    }
+  ]
+}

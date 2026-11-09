@@ -1,0 +1,20 @@
+{
+  "name": "mathpaperlib",
+  "version": "0.1.0",
+  "description": "A library of papers for agents: find in zbMATH, arXiv, Crossref, OpenAlex and MathNet, download under readable names, take PDFs from an inbox folder, search full texts.",
+  "author": {
+    "name": "LeoLourson"
+  },
+  "repository": "https://github.com/LeoLourson/MathPaperLib",
+  "license": "MIT",
+  "keywords": ["literature", "papers", "arxiv", "zbmath", "mcp"],
+  "mcpServers": {
+    "mathpaperlib": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/LeoLourson/MathPaperLib", "mathpaperlib", "mcp"],
+      "env": {
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}
