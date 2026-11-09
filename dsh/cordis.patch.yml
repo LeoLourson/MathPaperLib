@@ -1,0 +1,25 @@
+# Bundle layer: the MCP server that owns the library of papers and the plugin that adds the
+# skills and the prompt section.
+#
+# No path of any machine belongs here. uvx runs the package from GitHub; the server and the
+# plugin find the same library: MATHPAPERLIB_HOME, else ~/Literature. The server starts without
+# a project; an agent selects one with use_project. A machine that runs a local checkout
+# overrides the first entry in its own profile patch (see README).
+- insert:
+    - id: mcp-mathpaperlib
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: mathpaperlib
+        transport: stdio
+        command: uvx
+        args:
+          - '--from'
+          - 'git+https://github.com/LeoLourson/MathPaperLib'
+          - 'mathpaperlib'
+          - '--no-project'
+          - 'mcp'
+        env:
+          PYTHONUTF8: '1'
+        failOnStartupError: false
+    - id: dsh-mathpaperlib
+      name: 'dsh-mathpaperlib'

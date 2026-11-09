@@ -1,0 +1,32 @@
+{
+  "name": "dsh-mathpaperlib",
+  "version": "0.1.0",
+  "description": "MathPaperLib as one DSH plugin: a library of papers for agents through MCP tools.",
+  "keywords": [
+    "dsh-plugin",
+    "mcp",
+    "literature"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeoLourson/MathPaperLib.git",
+    "directory": "dsh"
+  },
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
