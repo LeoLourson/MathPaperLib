@@ -4,7 +4,7 @@ import json
 import pytest
 
 from conftest import LONG, library_files, make_project, pdf_bytes
-from mathpaperlib import library, lit, papers, paths, registry, web
+from mathpaperlib import library, lit, migrate as migration, papers, paths, registry, web
 
 ARTICLE = dict(authors='Natalia P. Bondarenko', title='Inverse spectral problems for operators with involution',
                year='2021', version='Journal of Spectral Theory 11 (2021), 1-30', url='https://doi.org/10.1234/abc',
@@ -153,3 +153,51 @@ def test_cli_where_and_library(shelf, online, capsys):
     out = capsys.readouterr().out
     assert NAME in out and 'doi:10.1234/abc' in out
     assert paths.LIBRARY == shelf.resolve()
+
+
+def old_project(tmp_path):
+    rows = [dict(code='S1', title='First paper', authors='A. Author', version='J. (2010)', url='https://e.org/1',
+                 filename='one.pdf', role='r'),
+            dict(code='S2', title='Second paper', authors='B. Writer', version='J. (2011)', url='https://e.org/2',
+                 filename='two.pdf', role='r')]
+    root = make_project(tmp_path / 'old', rows)
+    old = root / 'output' / 'literature'
+    old.mkdir(parents=True)
+    (old / 'one.pdf').write_bytes(pdf_bytes(LONG))
+    (old / 'two.pdf').write_bytes(pdf_bytes(LONG + ' two'))
+    return root
+
+
+def saved_names(root):
+    rows = json.loads((root / 'sources' / 'papers.json').read_text(encoding='utf-8'))
+    return {row['code']: row['filename'] for row in rows}
+
+
+def test_migrate_dry_run_changes_nothing_and_a_real_run_follows(tmp_path, shelf):
+    root = old_project(tmp_path)
+    lit.configure(root, shelf)
+    report = '\n'.join(lit.migrate(dry_run=True))
+    assert 'S1: one.pdf → Author 2010 - First paper.pdf' in report
+    assert not shelf.exists()  # библиотека даже не создана
+    assert saved_names(root) == {'S1': 'one.pdf', 'S2': 'two.pdf'}
+    lit.migrate()
+    assert library_files(shelf) == ['Author 2010 - First paper.pdf', 'Writer 2011 - Second paper.pdf']
+
+
+def test_migrate_keeps_a_row_whose_file_could_not_be_written(tmp_path, shelf, monkeypatch):
+    root = old_project(tmp_path)
+    lit.configure(root, shelf)
+    real_put = migration._put
+
+    def failing_put(source, target, move):
+        if source.name == 'one.pdf':
+            raise FileNotFoundError(3, 'path too long', str(target))
+        real_put(source, target, move)
+
+    monkeypatch.setattr(migration, '_put', failing_put)
+    report = '\n'.join(lit.migrate())
+    assert 'S1: ОШИБКА' in report
+    assert saved_names(root) == {'S1': 'one.pdf', 'S2': 'Writer 2011 - Second paper.pdf'}
+    monkeypatch.setattr(migration, '_put', real_put)
+    lit.migrate()
+    assert saved_names(root)['S1'] == 'Author 2010 - First paper.pdf'

@@ -210,8 +210,10 @@ def inbox(files: list[str] | None = None, ident: str | None = None) -> list[str]
     return _rebuilt(inbox_source.inbox, files, ident)
 
 
-def migrate(source: str | None = None, move: bool = False) -> list[str]:
+def migrate(source: str | None = None, move: bool = False, dry_run: bool = False) -> list[str]:
     """Переносит файлы проекта со старой раскладки (output/literature) в библиотеку."""
+    if dry_run:
+        return migration.migrate(source, move, dry_run=True)
     return _rebuilt(lambda: migration.migrate(source, move) + index_texts())
 
 
@@ -255,6 +257,7 @@ def main(argv: list[str] | None = None) -> None:
     p = commands.add_parser('migrate', help='перенести файлы проекта из output/literature в библиотеку')
     p.add_argument('--from', dest='source', help='старая папка; по умолчанию output/literature')
     p.add_argument('--move', action='store_true', help='переносить, а не копировать')
+    p.add_argument('--dry-run', action='store_true', help='только показать, что будет перенесено')
     p = commands.add_parser('fetch', help='восстановить недостающие файлы; с кодами — скачать и открытый PDF')
     p.add_argument('codes', nargs='*')
     p = commands.add_parser('pdf', help='скачать PDF работы для сверки номеров и страниц')
@@ -312,7 +315,7 @@ def main(argv: list[str] | None = None) -> None:
                                      args.year),
         'attach': lambda: attach(args.ref, args.source),
         'inbox': lambda: inbox(args.files, args.ident),
-        'migrate': lambda: migrate(args.source, args.move),
+        'migrate': lambda: migrate(args.source, args.move, args.dry_run),
         'fetch': lambda: fetch(refs or None),
         'pdf': lambda: pdf(args.ref),
         'pages': lambda: pages(args.ref, *store.page_range(args.range), args.dpi),

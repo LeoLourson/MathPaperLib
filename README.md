@@ -83,7 +83,9 @@ work on the library alone; the MCP tool `use_project` selects a project during a
 A project made with the `lit.py` of the AutoMath research template keeps its files in
 `output/literature/` under identifier names. `lit migrate` copies them into the library under new
 names together with their text layers and transcription parts, then rewrites the registry. The
-old folder stays until you delete it; with `--move` the files are moved instead.
+old folder stays until you delete it; with `--move` the files are moved instead. `--dry-run`
+lists what would be moved and changes nothing: a trial run without it already rewrites the
+registry, and a second run then finds nothing to move.
 
 ## Installation
 
@@ -138,7 +140,7 @@ The MCP server is started by
 | `annotate FILE.json`, `audit` | descriptions of the papers of a project, and their check |
 | `fetch [CODE...]`, `catalog`, `index` | restore missing files, rebuild the catalog, index new texts |
 | `list`, `library`, `where` | papers of the project, the inventory of the library, the paths in use |
-| `migrate [--from DIR] [--move]` | move a project of the old layout into the library |
+| `migrate [--from DIR] [--move] [--dry-run]` | move a project of the old layout into the library |
 | `mcp` | the MCP server on stdio |
 
 `REF` is a registry code (`S4`), an identifier, or the beginning of a file name in the library.
