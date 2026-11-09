@@ -87,8 +87,9 @@ old folder stays until you delete it; with `--move` the files are moved instead.
 
 ## Installation
 
-The package runs with [uv](https://docs.astral.sh/uv/). The first full-text search downloads the
-embedding model from Hugging Face, about 470 MB.
+The package runs with [uv](https://docs.astral.sh/uv/). The first start of the MCP server, or the first
+indexing or search from the command line, downloads the embedding model from Hugging Face,
+about 470 MB; the server begins to answer only after the download ends.
 
 Command line:
 
