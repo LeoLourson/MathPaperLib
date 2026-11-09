@@ -47,3 +47,7 @@ def test_long_titles_are_cut_at_a_word():
 def test_numbered_ignores_case():
     assert naming.numbered('Ivanov 2019 - X', {'ivanov 2019 - x', 'ivanov 2019 - x (2)'}) == 'Ivanov 2019 - X (3)'
     assert naming.numbered('Ivanov 2019 - Y', {'ivanov 2019 - x'}) == 'Ivanov 2019 - Y'
+
+
+def test_year_in_parentheses_beats_a_page_number_that_looks_like_a_year():
+    assert naming.year_of(dict(version='Symmetry 13(10), 1972 (2021)')) == '2021'

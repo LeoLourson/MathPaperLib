@@ -69,7 +69,7 @@ def authors_part(authors: str) -> str:
 
 
 def year_of(record: dict) -> str:
-    """Год: поле year, иначе номер arXiv (2107.12209 → 2021), иначе первое «19xx/20xx» в версии."""
+    """Год: поле year, иначе номер arXiv (2107.12209 → 2021), иначе «19xx/20xx» в скобках в версии, иначе первое такое число."""
     year = str(record.get('year') or '').strip()
     if re.fullmatch(r'\d{4}', year):
         return year
@@ -78,7 +78,8 @@ def year_of(record: dict) -> str:
     if arxiv:
         yy = int(arxiv.group(1))
         return str(1900 + yy if yy >= 90 else 2000 + yy)
-    found = re.search(r'\b(1[89]\d\d|20\d\d)\b', version)
+    found = (re.search(r'\((1[89]\d\d|20\d\d)\)', version)  # «13(10), 1972 (2021)»: 1972 — номер статьи
+             or re.search(r'\b(1[89]\d\d|20\d\d)\b', version))
     return found.group(1) if found else ''
 
 
